@@ -1,0 +1,32 @@
+{
+  "name": "auth-middleware",
+  "version": "1.0.0",
+  "description": "Authentication middleware for Express",
+  "main": "index.js",
+  "dependencies": {
+    "auth": "git://github.com/damonmcminn/auth.git",
+    "jasmine": "^2.2.1"
+  },
+  "devDependencies": {
+    "jasmine": "^2.2.1"
+  },
+  "scripts": {
+    "test": "node_modules/jasmine/bin/jasmine.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/damonmcminn/auth-middleware.git"
+  },
+  "keywords": [
+    "authentication",
+    "middleware",
+    "express",
+    "jwt"
+  ],
+  "author": "Damon McMinn",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/damonmcminn/auth-middleware/issues"
+  },
+  "homepage": "https://github.com/damonmcminn/auth-middleware"
+}
