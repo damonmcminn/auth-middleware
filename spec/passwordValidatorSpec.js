@@ -1,5 +1,5 @@
-var password = require('../lib/passwordValidator')({});
-var hash = require('auth').password.hash;
+var password = require('../lib/passwordValidator')(1);
+var hash = require('auth-utilities').password(1).hash;
 
 describe('Password', function() {
 

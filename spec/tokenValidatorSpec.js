@@ -1,4 +1,4 @@
-var jwt = require('auth').token('secret');
+var jwt = require('auth-utilities').token('secret');
 var TokenValidator = require('../lib/tokenValidator');
 var currentJwt = jwt.generate({exp: Date.now()*2});
 var expiredJwt = jwt.generate({exp: 1});
