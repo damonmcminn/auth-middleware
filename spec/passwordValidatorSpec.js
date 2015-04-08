@@ -1,9 +1,9 @@
-var password = require('../lib/password')({});
+var password = require('../lib/passwordValidator')({});
 var hash = require('auth').password.hash;
 
 describe('Password', function() {
 
-  it('should pass request to next() if valid', function(done) {
+  it('should pass request to next() if valid and attach token to req', function(done) {
     hash('password').then(function(hashed) {
       var req = {
         body: {password: 'password'},

@@ -3,5 +3,5 @@ module.exports = AuthMiddleware;
 
 function AuthMiddleware() {};
 
-AuthMiddleware.password = require('./lib/password');
-AuthMiddleware.token = require('./lib/token');
+AuthMiddleware.password = require('./lib/passwordValidator');
+AuthMiddleware.token = require('./lib/tokenValidator');
