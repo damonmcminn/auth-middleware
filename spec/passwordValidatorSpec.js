@@ -3,22 +3,28 @@ var hash = auth.password(1).hash;
 var passwordValidator = require('../lib/passwordValidator');
 
 function findUser(email, callback) {
-  hash('password').then(function(hashed) {
-    callback(null, {
-      payload: {
-        exp: Date.now()
-      },
-      password: hashed
+  return hash('password').then(function(hashed) {
+    return new Promise(function(resolve, reject) {
+      resolve({
+        payload: {
+          exp: Date.now()
+        },
+        password: hashed
+      });
     });
   });
 }
 
 function notFoundUser(email, callback) {
-  callback(null, false);
+  return new Promise(function(resolve, reject) {
+    resolve(false);
+  });
 }
 
-function findUserError(email, callback) {
-  callback(new Error('find user error'));
+function findUserError(email) {
+  return new Promise(function(resolve, reject) {
+    reject(new Error('find user error'));
+  });
 }
 
 var canFindUser = passwordValidator({
@@ -40,6 +46,9 @@ var errorFindingUser = passwordValidator({
   findUser: findUserError,
   secret: 'secret',
   parse: auth.parseHeader('basic'),
+  type: function(req) {
+    return req.headers.authorization;
+  },
   rounds: 1
 });
 
@@ -63,7 +72,7 @@ describe('Password', function() {
     });
   });
 
-  it('should call next() with Error if invalid', function(done) {
+  it('should call next() with Error if invalid password', function(done) {
     hash('password').then(function(hashed) {
       var req = {
         headers: {
@@ -90,6 +99,20 @@ describe('Password', function() {
       };
       canFindUser(req, null, function(fromNext) {
         expect(fromNext.name).toBe('TypeError');
+        done();
+      });
+    });
+  });
+
+  it('should call next() with err from findUser', function(done) {
+    hash('password').then(function(hashed) {
+      var req = {
+        headers: {
+          authorization: `Basic ${validPassword}`
+        }
+      };
+      errorFindingUser(req, null, function(err) {
+        expect(err.message).toBe('find user error');
         done();
       });
     });
