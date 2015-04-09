@@ -4,7 +4,7 @@
   "description": "Authentication middleware for Express",
   "main": "index.js",
   "dependencies": {
-    "auth-utilities": "^1.0.1-0",
+    "auth-utilities": "^1.1.0",
     "jasmine": "^2.2.1"
   },
   "devDependencies": {
