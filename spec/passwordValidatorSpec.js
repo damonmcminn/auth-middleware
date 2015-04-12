@@ -73,15 +73,16 @@ describe('Password', function(done) {
     });
   });
 
-  it('should call next() with Error if invalid password', function(done) {
+  it('should call next() with PasswordError if invalid password', function(done) {
     hash('password').then(function(hashed) {
       var req = {
         headers: {
           authorization: `Basic ${invalidPassword}`
         }
       };
-      canFindUser(req, null, function(fromNext) {
-        expect(fromNext.message).toBe('Bad password');
+      canFindUser(req, null, function(err) {
+        expect(err.message).toBe('Bad password');
+        expect(err.name).toBe('PasswordError');
         done();
       });
     });
@@ -117,15 +118,15 @@ describe('Password', function(done) {
     });
   });
 
-  it('should call next() with Error if no user found', function(done) {
+  it('should call next() with UserNotFoundError if no user found', function(done) {
     hash('password').then(function(hashed) {
       var req = {
         headers: {
           authorization: `Basic ${validPassword}`
         }
       };
-      cannotFindUser(req, null, function(fromNext) {
-        expect(fromNext.message).toBe('User not found');
+      cannotFindUser(req, null, function(err) {
+        expect(err.name).toBe('UserNotFoundError');
         done();
       });
     });
