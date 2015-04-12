@@ -53,21 +53,23 @@ describe('Password', function(done) {
     type: function(req) {
       return req.headers.authorization;
     },
+    buildResponse: function(token) {
+      return {token: token};
+    },
     rounds: 1
   });
 
-  it('should attach req.token and call next() if valid password', function(done) {
+  it('should call res.json if password valid', function(done) {
     hash('password').then(function(hashed) {
       var req = {
         headers: {
           authorization: `Basic ${validPassword}`
         }
       };
-      canFindUser(req, null, function(fromNext) {
-        expect(fromNext).toBe(undefined);
-        expect(req.token).toEqual(jasmine.any(String));
+      canFindUser(req, {json: function(response) {
+        expect(response.token).toEqual(jasmine.any(String));
         done();
-      });
+      }});
     });
   });
 
