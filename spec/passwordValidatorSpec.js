@@ -1,138 +1,114 @@
+var passwordValidator = require('../lib/passwordValidator');
 var auth = require('auth-utilities');
 var hash = auth.password(1).hash;
-var passwordValidator = require('../lib/passwordValidator');
+var f = function() {};
 
-describe('Password', function(done) {
 
-  var validPassword = (new Buffer('user:password')).toString('base64');
-  var invalidPassword = (new Buffer('user:invalidpassword')).toString('base64');
+describe('PasswordValidator', function() {
 
-  var errorFindingUser = passwordValidator({
-    findUser: function(email) {
-      return new Promise(function(resolve, reject) {
-        reject(new Error('find user error'));
-      });
-    },
-    secret: 'secret',
-    parse: auth.parseHeader('basic'),
-    type: function(req) {
-      return req.headers.authorization;
-    },
-    rounds: 1
+  it('should return a function', function() {
+    var f = function() {};
+    expect(passwordValidator(f, 'string')).toEqual(jasmine.any(Function));
   });
 
-  var cannotFindUser = passwordValidator({
-    findUser: function(email) {
-      return new Promise(function(resolve, reject) {
-        resolve(false);
-      });
-    },
-    secret: 'secret',
-    parse: auth.parseHeader('basic'),
-    type: function(req) {
-      return req.headers.authorization;
-    },
-    rounds: 1
+  it('should throw a ReferenceError if findUser or secret are undefined', function() {
+    var p = passwordValidator;
+    var f = function() {}
+
+    var errors = [
+      p,
+      function() { return p(f)}
+    ];
+
+    errors.forEach(function(e) {
+      expect(e).toThrowError(ReferenceError);
+    });
+
   });
 
-  var canFindUser = passwordValidator({
-    findUser: function(email) {
-      return hash('password').then(function(hashed) {
-        return new Promise(function(resolve, reject) {
-          resolve({
+  it('should throw a TypeError if findUser or secret are incorrect type', function() {
+    var p = passwordValidator;
+    var f = function() {}
+
+    var errors = [
+      function() { return p({}, 'string')},
+      function() { return p(f, f)}
+    ];
+
+    errors.forEach(function(e) {
+      expect(e).toThrowError(TypeError);
+    });
+
+  });
+
+  describe('returned function', function() {
+
+    var f = function() {};
+
+    it('should return a Promise', function() {
+      var p = passwordValidator(f, 'secret');
+      expect(p().constructor.name).toBe('Promise');
+    });
+
+    it('should reject with AuthError if bad password', function(done) {
+      var findUser = function(req) {
+        return hash('password').then(function(hashed) {
+          return Promise.resolve({
             payload: {
               exp: Date.now()
             },
-            password: hashed
+            plain: 'bad password',
+            hash: hashed
           });
         });
-      });
-    },
-    secret: 'secret',
-    parse: auth.parseHeader('basic'),
-    type: function(req) {
-      return req.headers.authorization;
-    },
-    buildResponse: function(token) {
-      return {token: token};
-    },
-    rounds: 1
-  });
+      }
 
-  it('should call res.json if password valid', function(done) {
-    hash('password').then(function(hashed) {
-      var req = {
-        headers: {
-          authorization: `Basic ${validPassword}`
-        }
-      };
-      canFindUser(req, {json: function(response) {
-        expect(response.token).toEqual(jasmine.any(String));
-        done();
-      }});
-    });
-  });
-
-  it('should call next() with AuthError if invalid password', function(done) {
-    hash('password').then(function(hashed) {
-      var req = {
-        headers: {
-          authorization: `Basic ${invalidPassword}`
-        }
-      };
-      canFindUser(req, null, function(err) {
-        expect(err.message).toBe('Bad password');
+      var validator = passwordValidator(findUser, 'secret');
+      validator()
+      .catch(function(err) {
         expect(err.name).toBe('AuthError');
         expect(err.code).toBe(401);
         done();
       });
+
     });
-  });
 
-  it('should throw a ReferenceError if options undefined', function() {
-    expect(passwordValidator).toThrowError(ReferenceError, 'options undefined');
-  });
+    it('should resolve with token if password valid', function(done) {
+      var findUser = function(req) {
+        return hash('password').then(function(hashed) {
+          return Promise.resolve({
+            payload: {
+              exp: Date.now()
+            },
+            plain: 'password',
+            hash: hashed
+          });
+        });
+      }
 
-  it('should pass a TypeError to next() if cannot parse req[property]', function(done) {
-    hash('password').then(function(hashed) {
-      var req = {
-        headers: {}
-      };
-      canFindUser(req, null, function(fromNext) {
-        expect(fromNext.name).toBe('TypeError');
+      var validator = passwordValidator(findUser, 'secret');
+      validator()
+      .then(function(token) {
+        expect(token.split('.').length).toBe(3);
         done();
       });
-    });
-  });
 
-  it('should call next() with err from findUser', function(done) {
-    hash('password').then(function(hashed) {
-      var req = {
-        headers: {
-          authorization: `Basic ${validPassword}`
-        }
-      };
-      errorFindingUser(req, null, function(err) {
-        expect(err.message).toBe('find user error');
+    });
+
+    it('should reject with Error from findUser', function(done) {
+      var findUser = function(req) {
+        return Promise.reject('findUser error');
+      }
+
+      var validator = passwordValidator(findUser, 'secret');
+      validator()
+      .catch(function(err) {
+        expect(err).toBe('findUser error');
         done();
       });
-    });
-  });
 
-  it('should call next() with AuthError if no user found', function(done) {
-    hash('password').then(function(hashed) {
-      var req = {
-        headers: {
-          authorization: `Basic ${validPassword}`
-        }
-      };
-      cannotFindUser(req, null, function(err) {
-        expect(err.name).toBe('AuthError');
-        expect(err.message).toBe('User not found');
-        expect(err.code).toBe(401);
-        done();
-      });
     });
+
   });
 
 });
