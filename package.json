@@ -6,7 +6,7 @@
   "dependencies": {
     "auth-utilities": "^1.1.0",
     "jasmine": "^2.2.1",
-    "simple-error-factory": "^0.1.0"
+    "simple-error-factory": "^0.2.0"
   },
   "devDependencies": {
     "jasmine": "^2.2.1"
