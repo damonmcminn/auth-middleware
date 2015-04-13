@@ -21,29 +21,35 @@ describe('TokenValidator', function() {
     });
   });
 
-  it('should call next() with a missing token Error', function(done) {
+  it('should call next() with a missing token AuthorizationError', function(done) {
     req.headers.authorization = undefined;
 
     tokenValidator(req, null, function(err) {
+      expect(err.name).toBe('AuthorizationError');
       expect(err.message).toBe('Missing token');
+      expect(err.code).toBe(401);
       done();
     });
   });
 
-  it('should call next() with an expired token Error', function(done) {
+  it('should call next() with an expired token AuthorizationError', function(done) {
     req.headers.authorization = `Bearer ${expiredJwt}`;
 
     tokenValidator(req, null, function(err) {
+      expect(err.name).toBe('AuthorizationError');
       expect(err.message).toBe('Expired token');
+      expect(err.code).toBe(401);
       done();
     });
   });
 
-  it('should call next() with an bad token Error', function(done) {
+  it('should call next() with a bad token AuthorizationError', function(done) {
     req.headers.authorization = `Bearer very.bad.token`;
 
     tokenValidator(req, null, function(err) {
+      expect(err.name).toBe('AuthorizationError');
       expect(err.message).toBe('Bad token');
+      expect(err.code).toBe(401);
       done();
     });
   });
