@@ -1,6 +1,6 @@
 {
   "name": "auth-middleware",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Authentication middleware for Express",
   "main": "index.js",
   "dependencies": {
