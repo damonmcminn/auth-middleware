@@ -5,3 +5,4 @@ function AuthMiddleware() {};
 
 AuthMiddleware.password = require('./lib/passwordValidator');
 AuthMiddleware.token = require('./lib/tokenValidator');
+AuthMiddleware.authenticate = require('./lib/authenticate');
