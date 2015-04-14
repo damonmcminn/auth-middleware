@@ -5,7 +5,7 @@ var expiredJwt = jwt.generate({exp: 1});
 
 describe('TokenValidator', function() {
 
-  var tokenValidator = TokenValidator({secret: 'secret'});
+  var tokenValidator = TokenValidator('secret');
   var req = {headers: {}};
 
   it('should throw a ReferenceError if called without a secret', function() {

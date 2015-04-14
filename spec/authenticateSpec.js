@@ -41,7 +41,7 @@ describe('Authenticate', function() {
       var middleware = authenticate(valid);
 
       middleware(null, {json: function(response) {
-        expect(response.validated).toBe(true);
+        expect(response.token.validated).toBe(true);
         done();
       }});
 
