@@ -12,11 +12,11 @@ describe('TokenValidator', function() {
     expect(TokenValidator).toThrowError(ReferenceError);
   });
 
-  it('should attach JWT payload to req.tokenPayload', function(done) {
+  it('should attach JWT payload to req.user', function(done) {
     req.headers.authorization = `Bearer ${currentJwt}`
 
     tokenValidator(req, null, function() {
-      expect(req.tokenPayload.exp).toBeGreaterThan(Date.now());
+      expect(req.user.exp).toBeGreaterThan(Date.now());
       done();
     });
   });
