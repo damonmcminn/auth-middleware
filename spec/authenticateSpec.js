@@ -40,8 +40,8 @@ describe('Authenticate', function() {
 
       var middleware = authenticate(valid);
 
-      middleware(null, {json: function(response) {
-        expect(response.token.validated).toBe(true);
+      middleware(null, {json: function(user) {
+        expect(user.validated).toBe(true);
         done();
       }});
 

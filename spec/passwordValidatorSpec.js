@@ -81,15 +81,16 @@ describe('PasswordValidator', function() {
               exp: Date.now()
             },
             plain: 'password',
-            hash: hashed
+            hash: hashed,
+            data: 'data'
           });
         });
       }
 
       var validator = passwordValidator(findUser, 'secret');
       validator()
-      .then(function(token) {
-        expect(token.split('.').length).toBe(3);
+      .then(function(user) {
+        expect(user.token.split('.').length).toBe(3);
         done();
       });
 
