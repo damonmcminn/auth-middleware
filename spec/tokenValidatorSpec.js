@@ -69,6 +69,24 @@ describe('TokenValidator', function() {
       done();
 
     });
+  });
+
+  it('optional function should return Promise that rejects with error to pass to next()', function(done) {
+
+    var fn = function(payload) {
+      return Promise.reject(new Error('rejection error'));
+    };
+
+    var tv = TokenValidator('secret', fn);
+
+    req.headers.authorization = `Bearer ${currentJwt}`
+    tv(req, null, function(err) {
+
+      expect(err.message).toBe('rejection error');
+      done();
+
+    });
 
   });
+
 });
