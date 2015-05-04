@@ -53,4 +53,22 @@ describe('TokenValidator', function() {
       done();
     });
   });
+
+  it('should optionally accept a function that returns a Promise that resolves with data to attach to req.user', function(done) {
+
+    var fn = function(payload) {
+      return Promise.resolve({foo: 'bar'});
+    };
+
+    var tv = TokenValidator('secret', fn);
+
+    req.headers.authorization = `Bearer ${currentJwt}`
+    tv(req, null, function() {
+
+      expect(req.user.foo).toBe('bar');
+      done();
+
+    });
+
+  });
 });
