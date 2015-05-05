@@ -89,4 +89,19 @@ describe('TokenValidator', function() {
 
   });
 
+  it('should have fresh err state between requests', function(done) {
+
+    var tv = TokenValidator('secret');
+
+    req.headers.authorization = 'Bearer bad.token';
+    tv(req, null, function() {
+      req.headers.authorization = `Bearer ${currentJwt}`;
+      tv(req, null, function(err) {
+        expect(err).not.toBeDefined();
+        done();
+      });
+    });
+
+  });
+
 });
